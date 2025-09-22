@@ -1,0 +1,6 @@
+ts,latency_ms,region,device_id
+2025-01-01T00:00:00Z,42,us-west,dev-001
+2025-01-01T00:05:00Z,58,us-west,dev-001
+2025-01-01T00:10:00Z,35,us-west,dev-002
+2025-01-01T00:15:00Z,110,us-east,dev-101
+2025-01-01T00:20:00Z,47,us-east,dev-101
