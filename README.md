@@ -24,3 +24,6 @@ Outputs will appear in `reports/tables/` and `reports/figures/`.
 
 ## Preview
 After `make quickstart`, you should see a CSV table and one PNG in `reports/`.
+
+![Latency p95 over time (sample)](reports/figures/latency_p95.png)
+
