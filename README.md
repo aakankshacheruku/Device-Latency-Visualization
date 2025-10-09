@@ -1,29 +1,86 @@
 # Device Latency Data Visualization
 
-Small end-to-end project to compute latency summaries (p50/p95) and a simple plot. I focused on a clear pipeline and tangible outputs. I plan to expand metrics and coverage over time.
+Reproducible mini-pipeline that computes latency summaries (p50/p95/p99), validates inputs, and exports a table and figure to `reports/`.  
+Structured to reflect internal analytics standards: documented, parameterized, and testable.
+
+## Purpose
+Operational analytics depends on repeatability and validated data.  
+This workflow performs:
+- extraction and merge of raw latency data  
+- cleaning and validation  
+- descriptive statistics generation  
+- artifact output for review or dashboard import  
+
+## Structure
+data/
+sample/ # example CSV inputs
+reports/
+tables/ # generated .csv
+figures/ # generated .png
+src/latency/
+io.py # read/write helpers
+compute.py # percentiles, tails, summary
+plot.py # visualization
+run.py # CLI entrypoint
+tests/
+test_compute.py # unit tests
+Makefile
+requirements.txt
+
+bash
+Copy code
 
 ## Quickstart
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 make quickstart
-```
+Artifacts produced:
 
-Outputs will appear in `reports/tables/` and `reports/figures/`.
+reports/tables/latency_summary.csv
 
-## What I learned
-- Keep calculations simple and NA-safe first, then iterate.
-- Make small, testable steps and produce artifacts (CSV/PNG) every run.
-- Write down decisions so future changes are easier to review.
+reports/figures/latency_distribution.png
 
-## Decisions & next steps
-- Start with a small sample so the pipeline is easy to run.
-- Percentiles over averages; I want to add geographic views and drift detection next.
-- Roadmap: expand data, add better metrics, and tighten tests as I go.
+Input schema
+CSV columns required:
 
-## Preview
-After `make quickstart`, you should see a CSV table and one PNG in `reports/`.
+device_id (string)
 
-![Latency p95 over time (sample)](reports/figures/latency_p95.png)
+timestamp (ISO8601)
 
+latency_ms (float)
+
+Validation rules:
+
+negative or zero latency_ms removed
+
+missing values dropped, count recorded
+
+optional capping of long-tail values for visualization only
+
+Metrics
+Descriptive: count, mean, std, min, max
+
+Percentiles: p50, p95, p99 (configurable)
+
+Tail share: proportion above SLA threshold (>100 ms by default)
+
+Running on custom data
+bash
+Copy code
+python -m latency.run \
+  --input data/sample/latency_sample.csv \
+  --out_dir reports \
+  --pcts 50 95 99 \
+  --sla_ms 100
+Testing
+bash
+Copy code
+pytest -q
+Roadmap
+weekly aggregation
+
+region and device roll-ups
+
+drift alerts on percentile change
