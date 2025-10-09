@@ -1,17 +1,21 @@
 # Device Latency Data Visualization
 
-Reproducible mini-pipeline that computes latency summaries (p50/p95/p99), validates inputs, and exports a table and figure to `reports/`.  
-Structured to reflect internal analytics standards: documented, parameterized, and testable.
+Reproducible mini-pipeline that computes latency summaries (p50/p95/p99), validates inputs, and exports tables and figures to `reports/`.  
+Structured for reliability, documentation, and repeatability.
+
+---
 
 ## Purpose
-Operational analytics depends on repeatability and validated data.  
-This workflow performs:
+Operational analytics relies on validated and reproducible data flows.  
+This workflow handles:
 - extraction and merge of raw latency data  
 - cleaning and validation  
-- descriptive statistics generation  
-- artifact output for review or dashboard import  
+- computation of descriptive statistics  
+- generation of reusable artifacts for dashboards or QA reports  
 
-## Structure
+---
+
+## Project Structure
 data/
 sample/ # example CSV inputs
 reports/
@@ -27,60 +31,60 @@ test_compute.py # unit tests
 Makefile
 requirements.txt
 
-bash
-Copy code
-
-## Quickstart
+___ 
+## Setup & Quickstart
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 make quickstart
-Artifacts produced:
+Artifacts produced
 
 reports/tables/latency_summary.csv
 
 reports/figures/latency_distribution.png
 
-Input schema
-CSV columns required:
+Input Schema
 
-device_id (string)
+| Column       | Type    | Description                   |
+| ------------ | ------- | ----------------------------- |
+| `device_id`  | string  | Unique identifier for device  |
+| `timestamp`  | ISO8601 | Timestamp of recorded latency |
+| `latency_ms` | float   | Latency in milliseconds       |
 
-timestamp (ISO8601)
+Validation rules
 
-latency_ms (float)
+negative or zero latency_ms values removed
 
-Validation rules:
+missing latency_ms dropped; count recorded in summary
 
-negative or zero latency_ms removed
+optional capping of extreme tail values for visualization only
 
-missing values dropped, count recorded
-
-optional capping of long-tail values for visualization only
+___
 
 Metrics
-Descriptive: count, mean, std, min, max
 
-Percentiles: p50, p95, p99 (configurable)
+| Category    | Metric                       | Description                   |
+| ----------- | ---------------------------- | ----------------------------- |
+| Descriptive | count, mean, std, min, max   | Basic distribution statistics |
+| Percentiles | p50, p95, p99 (configurable) | Latency thresholds            |
+| Tail Share  | share above SLA threshold    | Default SLA >100 ms           |
 
-Tail share: proportion above SLA threshold (>100 ms by default)
-
-Running on custom data
-bash
-Copy code
+Command-Line Execution
 python -m latency.run \
   --input data/sample/latency_sample.csv \
   --out_dir reports \
   --pcts 50 95 99 \
   --sla_ms 100
+
 Testing
-bash
-Copy code
 pytest -q
+
 Roadmap
-weekly aggregation
 
-region and device roll-ups
+- weekly aggregation
 
-drift alerts on percentile change
+- region and device roll-ups
+
+- drift alerts on percentile change
+```
